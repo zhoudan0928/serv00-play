@@ -438,9 +438,9 @@ upInsertFd() {
   local value=$3
 
   jq --arg field "$field" --arg value "$value" '
-        if has($field) then 
+        if has($field) then
                 .[$field] = $value
-        else 
+        else
                 . + {($field): $value}
         end
         ' "$jsonfile" >tmp.json && mv tmp.json "$jsonfile"
@@ -557,6 +557,11 @@ download_from_net() {
 
   case $app in
   "alist")
+    # 强制从GitHub下载ykxVK8yL5L/alist版本
+    echo "正在从GitHub下载ykxVK8yL5L/alist版本..."
+    if [ -e "alist" ]; then
+      rm -f alist
+    fi
     download_from_github_release "ykxVK8yL5L" "alist" "alist-freebsd-amd64.tar.gz"
     ;;
   "nezha-agent")
@@ -573,10 +578,12 @@ check_update_from_net() {
 
   case $app in
   "alist")
-    local current_version=$(./alist version | grep "Version: v" | awk '{print $2}')
-    if ! check_from_github "ykxVK8yL5L" "alist" "$current_version"; then
-      echo "未发现新版本!"
-      return 1
+    # 强制从GitHub下载ykxVK8yL5L/alist版本
+    echo "正在从GitHub下载ykxVK8yL5L/alist版本..."
+    if [ -e "alist" ]; then
+      local current_version=$(./alist version | grep "Version: v" | awk '{print $2}')
+      echo "当前版本: $current_version"
+      rm -f alist
     fi
     download_from_github_release "ykxVK8yL5L" "alist" "alist-freebsd-amd64.tar.gz"
     ;;
@@ -620,6 +627,60 @@ download_from_github_release() {
   local repository=$2
   local zippackage="$3"
 
+  # 特殊处理ykxVK8yL5L/alist仓库
+  if [[ "$user" == "ykxVK8yL5L" && "$repository" == "alist" ]]; then
+    echo "正在从GitHub下载ykxVK8yL5L/alist版本..."
+    # 直接使用最新版本的URL
+    local url="https://github.com/${user}/${repository}"
+    local latestUrl="$url/releases/latest"
+
+    # 获取最新版本号
+    local latest_version=$(curl -sL $latestUrl | sed -n 's/.*tag\/\(v[0-9.]*\).*/\1/p' | head -1)
+    if [[ -z "$latest_version" ]]; then
+      echo "无法获取最新版本号，使用固定版本v3.30.0"
+      latest_version="v3.30.0"
+    fi
+
+    echo "检测到最新版本: $latest_version"
+    local download_url="${url}/releases/download/$latest_version/$zippackage"
+    echo "下载URL: $download_url"
+
+    # 下载文件
+    curl -L -o "$zippackage" "$download_url"
+    if [[ ! -e "$zippackage" ]]; then
+      echo "下载 $zippackage 文件失败!"
+      return 1
+    fi
+
+    # 检查文件类型
+    if file "$zippackage" | grep -q "text"; then
+      echo "下载的文件不是有效的压缩包!"
+      cat "$zippackage"
+      rm -f "$zippackage"
+      return 1
+    fi
+
+    # 解压文件
+    echo "正在解压 $zippackage..."
+    tar -xzf "$zippackage"
+    if [[ $? -ne 0 ]]; then
+      echo "解压 $zippackage 文件失败!"
+      return 1
+    fi
+
+    # 检查alist文件是否存在
+    if [[ ! -e "alist" ]]; then
+      echo "解压后未找到alist文件!"
+      return 1
+    fi
+
+    chmod +x alist
+    rm -rf "$zippackage"
+    echo "成功下载并解压ykxVK8yL5L/alist版本!"
+    return 0
+  fi
+
+  # 其他仓库的处理逻辑保持不变
   local url="https://github.com/${user}/${repository}"
   local latestUrl="$url/releases/latest"
 
