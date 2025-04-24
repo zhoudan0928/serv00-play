@@ -630,19 +630,9 @@ download_from_github_release() {
   # 特殊处理ykxVK8yL5L/alist仓库
   if [[ "$user" == "ykxVK8yL5L" && "$repository" == "alist" ]]; then
     echo "正在从GitHub下载ykxVK8yL5L/alist版本..."
-    # 直接使用最新版本的URL
+    # 直接使用latest标签的URL
     local url="https://github.com/${user}/${repository}"
-    local latestUrl="$url/releases/latest"
-
-    # 获取最新版本号
-    local latest_version=$(curl -sL $latestUrl | sed -n 's/.*tag\/\(v[0-9.]*\).*/\1/p' | head -1)
-    if [[ -z "$latest_version" ]]; then
-      echo "无法获取最新版本号，使用固定版本v3.30.0"
-      latest_version="v3.30.0"
-    fi
-
-    echo "检测到最新版本: $latest_version"
-    local download_url="${url}/releases/download/$latest_version/$zippackage"
+    local download_url="${url}/releases/download/latest/$zippackage"
     echo "下载URL: $download_url"
 
     # 下载文件
