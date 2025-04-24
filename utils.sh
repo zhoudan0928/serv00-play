@@ -557,7 +557,7 @@ download_from_net() {
 
   case $app in
   "alist")
-    download_from_github_release "AlistGo" "alist" "alist-freebsd-amd64.tar.gz"
+    download_from_github_release "ykxVK8yL5L" "alist" "alist-freebsd-amd64.tar.gz"
     ;;
   "nezha-agent")
     download_from_github_release "nezhahq" "agent" "nezha-agent_freebsd_amd64.zip"
@@ -574,11 +574,11 @@ check_update_from_net() {
   case $app in
   "alist")
     local current_version=$(./alist version | grep "Version: v" | awk '{print $2}')
-    if ! check_from_github "AlistGo" "alist" "$current_version"; then
+    if ! check_from_github "ykxVK8yL5L" "alist" "$current_version"; then
       echo "未发现新版本!"
       return 1
     fi
-    download_from_github_release "AlistGo" "alist" "alist-freebsd-amd64.tar.gz"
+    download_from_github_release "ykxVK8yL5L" "alist" "alist-freebsd-amd64.tar.gz"
     ;;
   "nezha-agent")
     local current_version="v"$(./nezha-agent -v | awk '{print $3}')
