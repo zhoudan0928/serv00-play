@@ -349,10 +349,10 @@ make_outbound_socks5() {
      "type": "socks",
      "tag": "socks5_outbound",
      "server": "$server",
-     "server_port": $serv_port,   
-     "version": "5",              
-     "username": "$user",           
-     "password": "$pass"                  
+     "server_port": $serv_port,
+     "version": "5",
+     "username": "$user",
+     "password": "$pass"
   },
 EOF
 }
@@ -480,7 +480,7 @@ generate_config() {
     $([[ "$type" == "2" || "$type" =~ ^(3|4)\.[0-9]+$ ]] && cat temphy2.json)
    ],
     "outbounds": [
-    $([[ "$outbound" == "1" ]] && make_outbound_wireguard) 
+    $([[ "$outbound" == "1" ]] && make_outbound_wireguard)
     $([[ "$outbound" == "2" ]] && cat temp_outbound_socks5.json && rm -rf temp_outbound_socks5.json)
     {
       "type": "direct",
@@ -508,7 +508,7 @@ generate_config() {
         "protocol": "dns",
         "outbound": "dns-out"
       },
-      { 
+      {
         "ip_is_private": true,
         "outbound": "direct"
       },
@@ -1869,10 +1869,12 @@ installAlist() {
     return
   else
     cd "alist" || return 1
-    if [ ! -e "alist" ]; then
-      if ! download_from_net "alist"; then
-        return 1
-      fi
+    # 强制从GitHub下载ykxVK8yL5L/alist版本
+    if [ -e "alist" ]; then
+      rm -f alist
+    fi
+    if ! download_from_net "alist"; then
+      return 1
     fi
   fi
 
@@ -1984,12 +1986,14 @@ resetAdminPass() {
 updateAlist() {
   cd ${installpath}/serv00-play/alist || (echo "未安装alist" && return)
 
-  if ! check_update_from_net "alist"; then
+  stopAlist
+  # 强制从GitHub下载ykxVK8yL5L/alist版本
+  if [ -e "alist" ]; then
+    rm -f alist
+  fi
+  if ! download_from_net "alist"; then
     return 1
   fi
-
-  stopAlist
-  download_from_net "alist"
   chmod +x ./alist
   startAlist
   echo "更新完毕!"
@@ -3458,7 +3462,7 @@ addDomain() {
     fi
     curl -X POST "https://$url/api/addrec?token=$api_token" \
       -H "Content-Type: application/json" \
-      -d '{ 
+      -d '{
          "domain": "'"$domain"'",
          "registrar": "'"$registrar"'",
          "registrar_date": "'"$registrar_date"'",
@@ -3718,7 +3722,7 @@ setKeepAliveInterval() {
 
 linkAliveStatment() {
   cat <<EOF
-     全新的保活方式，无需借助cron，也不需要第三方平台(github/青龙/vps等登录方式)进行保活。 
+     全新的保活方式，无需借助cron，也不需要第三方平台(github/青龙/vps等登录方式)进行保活。
   在使用代理客户端的同时自动保活，全程无感！
 EOF
 }
