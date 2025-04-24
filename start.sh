@@ -49,7 +49,7 @@ install() {
 
   cd ${installpath}
   echo "正在安装..."
-  if ! git clone https://github.com/frankiejun/serv00-play.git; then
+  if ! git clone https://github.com/zhoudan0928/serv00-play.git; then
     echo -e "${RED}安装失败!${RESET}"
     exit 1
   fi
@@ -3742,7 +3742,7 @@ vip_statement() {
 }
 
 getLatestVer() {
-  ver=$(git ls-remote --tags https://github.com/frankiejun/serv00-play.git | awk -F/ '{print $3}' | sort -V | tail -n 1)
+  ver=$(git ls-remote --tags https://github.com/zhoudan0928/serv00-play.git | awk -F/ '{print $3}' | sort -V | tail -n 1)
   echo $ver
 }
 getCurrentVer() {
@@ -3755,9 +3755,10 @@ getCurrentVer() {
 }
 
 showMenu() {
-  art_wrod=$(figlet "serv00-play")
+  art_wrod=$(figlet "zhoudan-play")
   echo "<------------------------------------------------------------------>"
   echo -e "${CYAN}${art_wrod}${RESET}"
+  echo -e "${GREEN} 这是zhoudan的修改版本，使用ykxVK8yL5L/alist ${RESET}"
   echo -e "${GREEN} 饭奇骏频道:https://www.youtube.com/@frankiejun8965 ${RESET}"
   echo -e "${GREEN} TG交流群:https://t.me/fanyousuiqun ${RESET}"
   echo -e "${GREEN} 当前版本号:$(getCurrentVer) 最新版本号:$(getLatestVer) ${RESET}"
